@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import "../styles.css";
 import { I, AlchemyMark, TopNav } from "./data.jsx";
 import { Landing, Wizard } from "./landing.jsx";
-import { Running, Results, History } from "./results.jsx";
+import { Running, Results, History, ShareCardVisual } from "./results.jsx";
 import { useTweaks, TweaksPanel, TweakSection, TweakRadio } from "./tweaks.jsx";
 
 // Seed the resource map the landing illustration reads (was injected by the bundler at runtime).
@@ -274,5 +274,16 @@ function SiteFooter() {
   );
 }
 
+// Standalone embed view: ?embed=1 renders just the verdict card (no nav/footer),
+// for iframes and sales decks. Additive — the default app is unchanged.
+function EmbedView() {
+  return (
+    <div className="embed-stage">
+      <ShareCardVisual/>
+    </div>
+  );
+}
+
+const isEmbed = new URLSearchParams(window.location.search).get("embed");
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App/>);
+root.render(isEmbed ? <EmbedView/> : <App/>);

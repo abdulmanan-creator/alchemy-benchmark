@@ -207,7 +207,7 @@ export function LiveRace({ tone = "live", lanes = PROVIDERS, baseline = BASELINE
         const rank = ranked.findIndex(r => r.id === p.id) + 1;
         const cls = p.isUs ? "alchemy" : (lat > 200 ? "bad" : lat > 80 ? "warn" : "");
         return (
-          <div className="race-lane" key={p.id + tick + "_lane_" + p.id}>
+          <div className="race-lane" key={p.id}>
             <div className="race-name">
               <i style={{ background: p.color }}/>
               {p.name}

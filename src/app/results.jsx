@@ -1,4 +1,5 @@
 import React from "react";
+import { toPng } from "html-to-image";
 import { PROVIDERS, METHODS, REGIONS, BASELINE, I, AlchemyMark, Sparkline, MultiLine, LiveRace } from "./data.jsx";
 /* global React, PROVIDERS, METHODS, REGIONS, BASELINE, I, AlchemyMark, Sparkline, MultiLine, LiveRace */
 const { useState, useEffect, useRef, useMemo } = React;
@@ -602,31 +603,95 @@ function GeoMap({ large }) {
   );
 }
 
+// The verdict card visual, reused by the Share tab and the ?embed=1 view.
+export function ShareCardVisual({ cardRef }) {
+  return (
+    <div className="share-card" ref={cardRef}>
+      <div>
+        <div style={{display:"flex", alignItems:"center", gap:10, marginBottom: 32}}>
+          <AlchemyMark size={28}/>
+          <span style={{fontSize:18, fontWeight:500}}>alchemy benchmarks</span>
+        </div>
+        <h2 className="share-card-h">Alchemy was <b>4.7× faster</b> on Polymarket's traffic.</h2>
+      </div>
+      <div className="share-card-stats">
+        <div className="share-card-stat"><div className="v">23ms</div><div className="l">avg latency</div></div>
+        <div className="share-card-stat"><div className="v">99.99%</div><div className="l">success rate</div></div>
+        <div className="share-card-stat"><div className="v">5</div><div className="l">providers tested</div></div>
+        <div className="share-card-stat"><div className="v">84,321</div><div className="l">replays</div></div>
+      </div>
+    </div>
+  );
+}
+
+// Build the standalone embed URL (?embed=1) for the current origin/path.
+function embedUrl() {
+  const u = new URL(window.location.href);
+  u.search = "embed=1";
+  u.hash = "";
+  return u.toString();
+}
+
+// Clipboard with a fallback for non-secure / permission-denied contexts.
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (e) { /* fall through to execCommand */ }
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 function ShareCard() {
+  const cardRef = useRef(null);
+  const [copied, setCopied] = useState("");
+  const flash = (k) => { setCopied(k); setTimeout(() => setCopied(""), 1600); };
+
+  const downloadPng = async () => {
+    if (!cardRef.current) return;
+    try {
+      const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, backgroundColor: "#0C0F26", cacheBust: true });
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = "alchemy-benchmark.png";
+      a.click();
+    } catch (e) {
+      console.error("PNG export failed", e);
+    }
+  };
+  const copyLink = async () => {
+    await copyText(window.location.href.split("?")[0]);
+    flash("link");
+  };
+  const copyEmbed = async () => {
+    const code = `<iframe src="${embedUrl()}" width="640" height="360" style="border:0;border-radius:16px" title="Alchemy benchmark"></iframe>`;
+    await copyText(code);
+    flash("embed");
+  };
+
   return (
     <div>
       <div style={{textAlign:"center", marginBottom: 24, color:"rgba(255,255,255,0.6)"}}>
         Share this verdict — drops nicely into Slack, email, or your sales deck.
       </div>
-      <div className="share-card">
-        <div>
-          <div style={{display:"flex", alignItems:"center", gap:10, marginBottom: 32}}>
-            <AlchemyMark size={28}/>
-            <span style={{fontSize:18, fontWeight:500}}>alchemy benchmarks</span>
-          </div>
-          <h2 className="share-card-h">Alchemy was <b>4.7× faster</b> on Polymarket's traffic.</h2>
-        </div>
-        <div className="share-card-stats">
-          <div className="share-card-stat"><div className="v">23ms</div><div className="l">avg latency</div></div>
-          <div className="share-card-stat"><div className="v">99.99%</div><div className="l">success rate</div></div>
-          <div className="share-card-stat"><div className="v">5</div><div className="l">providers tested</div></div>
-          <div className="share-card-stat"><div className="v">84,321</div><div className="l">replays</div></div>
-        </div>
-      </div>
-      <div style={{display:"flex", gap:12, justifyContent:"center", marginTop: 24}}>
-        <button className="btn btn-secondary">{I.download} Download PNG</button>
-        <button className="btn btn-secondary">{I.share} Copy share link</button>
-        <button className="btn btn-primary">Embed on site</button>
+      <ShareCardVisual cardRef={cardRef}/>
+      <div style={{display:"flex", gap:12, justifyContent:"center", marginTop: 24, flexWrap:"wrap"}}>
+        <button className="btn btn-secondary" onClick={downloadPng}>{I.download} Download PNG</button>
+        <button className="btn btn-secondary" onClick={copyLink}>{I.share} {copied === "link" ? "Copied!" : "Copy share link"}</button>
+        <button className="btn btn-primary" onClick={copyEmbed}>{copied === "embed" ? "Embed code copied!" : "Embed on site"}</button>
       </div>
     </div>
   );
