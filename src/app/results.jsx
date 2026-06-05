@@ -222,11 +222,25 @@ export function Results({ resultsLayout, setScreen }) {
   );
 }
 
-function ResultsHero() {
+// Defaults match the curated sample report. Phase 2 (live runs) passes real `meta`.
+const SAMPLE_META = {
+  runId: "BR-2026-05-07-3142",
+  regions: "4 regions",
+  reqs: "84,321 requests",
+  when: "May 7, 2026 · 14:32",
+};
+
+function ResultsHero({ meta = SAMPLE_META }) {
   return (
     <div className="res-hero">
       <div className="res-hero-text">
-        <div className="res-hero-eyebrow">▾ Verdict · run #BR-2026-05-07-3142</div>
+        <div className="res-hero-eyebrow">▾ Verdict · run #{meta.runId}</div>
+        <div className="res-cues">
+          <a className="res-cue methodology" title="See how this benchmark was run">{I.shield} Methodology attached</a>
+          <span className="res-cue">{I.globe} {meta.regions}</span>
+          <span className="res-cue">{I.pulse} {meta.reqs}</span>
+          <span className="res-cue">{I.clock} {meta.when}</span>
+        </div>
         <h1 className="res-hero-h1">Alchemy was <b>4.7× faster</b> on your traffic.</h1>
         <p className="res-hero-sub">23ms avg vs. 108ms across 4 competitors. Highest success rate of any provider tested. Significant geographic advantage in EU and AP Southeast.</p>
         <div className="res-hero-stats">
