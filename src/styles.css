@@ -1029,3 +1029,22 @@ a { color: inherit; text-decoration: none; }
   text-decoration: none;
 }
 .res-cue.methodology:hover { background: rgba(54,63,249,0.20); }
+
+/* ============ Layout fixes (Phase 1) ============ */
+/* html stayed var(--white) from the shared rule; body is --ink, so any
+   over-scroll/overflow flashed white. Match the dark app frame. */
+html { background: var(--ink); }
+
+/* Grid/flex children default to min-width:auto and refused to shrink, pushing
+   the right column (geo map / "what we tested") offscreen past the container.
+   The geo map made it worse: aspect-ratio + min-height forced an intrinsic
+   ~560px width, so it needs width:100% (aspect-ratio then only drives height). */
+.run-grid > * { min-width: 0; }
+.run-grid .col-stack > * { min-width: 0; }
+.lat-grid > * { min-width: 0; }
+.geo-shell { width: 100%; }
+
+/* Geo pins: nudge the collision-prone card up-and-left so adjacent regions
+   (US West / US East) don't overlap. A flex-reverse barely moves it because the
+   pin container is center-transformed, so offset the card explicitly. */
+.geo-pin.up .pin-card { transform: translate(-34px, -66px); }

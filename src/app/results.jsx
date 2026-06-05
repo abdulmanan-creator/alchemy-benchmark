@@ -581,15 +581,15 @@ function ReliabilityScores({ compact }) {
 function GeoMap({ large }) {
   // Approximate pixel coords on world-dot-map — these are eyeballed but plausible
   const pins = [
-    { id: "us-east", x: "23%", y: "38%", region: "US East",      lat: 23,  win: true },
-    { id: "us-west", x: "12%", y: "40%", region: "US West",      lat: 24,  win: true },
+    { id: "us-east", x: "27%", y: "38%", region: "US East",      lat: 23,  win: true },
+    { id: "us-west", x: "9%",  y: "40%", region: "US West",      lat: 24,  win: true, place: "up" },
     { id: "eu",      x: "48%", y: "32%", region: "EU Central",   lat: 27,  win: true },
     { id: "ap",      x: "76%", y: "52%", region: "AP Southeast", lat: 32,  win: true },
   ];
   return (
     <div className="geo-shell" style={large ? { aspectRatio: "16/9", minHeight: 420 } : {}}>
       {pins.map(p => (
-        <div key={p.id} className="geo-pin" style={{left: p.x, top: p.y}}>
+        <div key={p.id} className={"geo-pin" + (p.place === "up" ? " up" : "")} style={{left: p.x, top: p.y}}>
           <div className="pin-dot"/>
           <div className="pin-card">
             <b>{p.region}</b>
