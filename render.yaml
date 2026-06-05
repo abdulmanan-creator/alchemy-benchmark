@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: alchemy-benchmarks
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    # Single-page app: serve index.html for any path.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /fonts/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
