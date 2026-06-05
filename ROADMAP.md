@@ -60,6 +60,12 @@ real data flows before we invest in breadth.
 
 ## Decisions locked for M1
 
+- **Sales context:** the current frontend is the product. Curated sample is the
+  prospect-facing default; real benchmarking is an additive **internal** mode. The FE
+  is protected and changes are additive + screenshot-verified. See
+  [`docs/sales-build-plan.md`](docs/sales-build-plan.md).
+- **Sequence:** Phase 1 = additive FE enhancements (credibility cues, hero polish,
+  embeddable export). Phase 2 = real-data internal mode (the M1 backend below).
 - **Providers:** public/free endpoints (free Alchemy key + dRPC's public endpoint).
   Proves the pipeline; **not** a fair paid-tier comparison — recorded as a caveat on
   every run.
